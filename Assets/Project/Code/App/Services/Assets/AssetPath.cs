@@ -2,6 +2,7 @@
 {
     public static class AssetPath
     {
-        public const string PATH = "Path";
+        public const string CARDS = "Cards";
+        public const string MENU_PANEL = "UI/MenuPanel";
     }
 }
