@@ -1,5 +1,6 @@
 ﻿using App.Services;
 using Menu;
+using Game;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -10,8 +11,6 @@ namespace App.States
 {
     public class MenuState : IPayloadedState<MenuPanel>
     {
-        private const string GAME_SCENE = "Game";
-
         private readonly IAppStateMachine _appStateMachine;
         private readonly AppServiceContainer _appContext;
 
@@ -30,12 +29,12 @@ namespace App.States
             _menuPanel.ExitAction += QuitGame;
         }
 
-        private void LaunchGame()
+        private void LaunchGame(GameMode gameMode)
         {
             _menuPanel.StartAction -= LaunchGame;
             _menuPanel.ExitAction -= QuitGame;
 
-            _appStateMachine.Enter<LaunchGameState, string>(GAME_SCENE);
+            _appStateMachine.Enter<LaunchGameState, GameMode>(gameMode);
         }
 
         private void QuitGame()
