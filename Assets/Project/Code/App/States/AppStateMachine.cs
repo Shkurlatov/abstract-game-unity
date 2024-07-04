@@ -15,7 +15,11 @@ namespace App.States
         {
             _states = new Dictionary<Type, IExitableState>
             {
-
+                [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader, appContext),
+                [typeof(LaunchMenuState)] = new LaunchMenuState(this, sceneLoader, appContext),
+                [typeof(MenuState)] = new MenuState(this, appContext),
+                [typeof(LaunchGameState)] = new LaunchGameState(this, sceneLoader, appContext),
+                [typeof(GameState)] = new GameState(this, sceneLoader, appContext),
             };
         }
 
