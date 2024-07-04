@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game
@@ -6,6 +7,8 @@ namespace Game
     public class HomeButton : MonoBehaviour
     {
         [SerializeField] private Button _homeButton;
+
+        public event Action HomeAction;
 
         private void OnEnable()
         {
@@ -19,7 +22,7 @@ namespace Game
 
         private void OnHomeButtonClick()
         {
-            Debug.Log("Home button clicked!");
+            HomeAction?.Invoke();
         }
     }
 }

@@ -18,15 +18,17 @@ namespace App.States
             _appStateMachine = appStateMachine;
             _sceneLoader = sceneLoader;
             _appContext = appContext;
-
-            RegisterServices();
         }
 
         public void Enter() =>
             _sceneLoader.Load(INITIAL_SCENE, OnLoaded);
 
-        private void OnLoaded() =>
+        private void OnLoaded()
+        {
+            RegisterServices();
+
             _appStateMachine.Enter<LaunchMenuState>();
+        }
 
         private void RegisterServices()
         {

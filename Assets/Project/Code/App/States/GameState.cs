@@ -23,19 +23,23 @@ namespace App.States
         {
             _gameController = gameController;
             _gameController.Initialize();
-            //_menuPanel = menuPanel;
-            //_menuPanel.StartAction += LaunchGame;
-            //_menuPanel.ExitAction += QuitGame;
+            _gameController.GameCompleteAction += ReturnToMenu;
         }
 
-        private void LaunchMenu()
+        private void ReturnToMenu()
         {
-            //_menuPanel.StartAction -= LaunchGame;
-            //_menuPanel.ExitAction -= QuitGame;
+            _gameController.GameCompleteAction -= ReturnToMenu;
 
-            //_appStateMachine.Enter<LaunchGameState, string>(GAME_SCENE);
+            _appStateMachine.Enter<LaunchMenuState>();
         }
 
-        public void Exit() { }
+        public void Exit()
+        {
+            if (_gameController != null)
+            {
+                _gameController.Cleanup();
+                _gameController = null;
+            }
+        }
     }
 }

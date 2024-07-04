@@ -1,4 +1,5 @@
 ﻿using Game.Cards;
+using System;
 
 namespace Game
 {
@@ -7,6 +8,8 @@ namespace Game
         private readonly ICards _cards;
         private readonly HomeButton _homeButton;
         private readonly GameMode _gameMode;
+
+        public event Action GameCompleteAction;
 
         public GameController(ICards cards, HomeButton homeButton, GameMode gameMode)
         {
@@ -18,6 +21,17 @@ namespace Game
         public void Initialize()
         {
             _cards.LayOut(_gameMode);
+            _homeButton.HomeAction += OnGameComplete;
+        }
+
+        public void OnGameComplete()
+        {
+            GameCompleteAction?.Invoke();
+        }
+
+        public void Cleanup()
+        {
+            _homeButton.HomeAction -= OnGameComplete;
         }
     }
 }
