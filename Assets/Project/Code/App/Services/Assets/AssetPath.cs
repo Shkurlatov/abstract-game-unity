@@ -4,5 +4,7 @@
     {
         public const string CARDS = "Cards";
         public const string MENU_PANEL = "UI/MenuPanel";
+        public const string HOME_BUTTON = "UI/HomeButton";
+        public const string SCORE_COUNTER = "UI/ScoreCounter";
     }
 }
