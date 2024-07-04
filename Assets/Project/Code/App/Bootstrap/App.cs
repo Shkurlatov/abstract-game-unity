@@ -8,10 +8,10 @@ namespace App.Bootstrap
         private readonly AppServiceContainer _appContext;
         private readonly IAppStateMachine _appStateMachine;
 
-        public App()
+        public App(SceneLoader sceneLoader)
         {
             _appContext = new AppServiceContainer();
-            _appStateMachine = new AppStateMachine(new SceneLoader(), _appContext);
+            _appStateMachine = new AppStateMachine(sceneLoader, _appContext);
             _appStateMachine.Enter<BootstrapState>();
         }
 

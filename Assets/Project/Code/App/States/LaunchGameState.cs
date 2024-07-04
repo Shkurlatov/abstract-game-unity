@@ -16,8 +16,8 @@ namespace App.States
             _appContext = appContext;
         }
 
-        public async void Enter(string sceneName) =>
-            await _sceneLoader.LoadSceneAsync(sceneName, OnLoaded);
+        public void Enter(string sceneName) =>
+            _sceneLoader.Load(sceneName, OnLoaded);
 
         private void OnLoaded()
         {

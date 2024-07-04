@@ -18,8 +18,8 @@ namespace App.States
             _appContext = appContext;
         }
 
-        public async void Enter() =>
-            await _sceneLoader.LoadSceneAsync(MENU_SCENE, OnLoaded);
+        public void Enter() =>
+            _sceneLoader.Load(MENU_SCENE, OnLoaded);
 
         private void OnLoaded()
         {

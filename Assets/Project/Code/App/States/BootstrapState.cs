@@ -22,8 +22,8 @@ namespace App.States
             RegisterServices();
         }
 
-        public async void Enter() =>
-            await _sceneLoader.LoadSceneAsync(INITIAL_SCENE, OnLoaded);
+        public void Enter() =>
+            _sceneLoader.Load(INITIAL_SCENE, OnLoaded);
 
         private void OnLoaded() =>
             _appStateMachine.Enter<LaunchMenuState>();

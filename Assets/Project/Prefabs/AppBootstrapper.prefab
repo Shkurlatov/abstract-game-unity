@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5218582703442601823}
   - component: {fileID: 4796491068608724662}
+  - component: {fileID: 6825841748533765450}
   m_Layer: 0
   m_Name: AppBootstrapper
   m_TagString: Untagged
@@ -42,5 +43,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 216e540f807d9864199babd4e2063c25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sceneLoader: {fileID: 6825841748533765450}
+--- !u!114 &6825841748533765450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139445617262490272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6afd8774d05f6147841dbb6d644f088, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -1,28 +1,31 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace App.Bootstrap
 {
-    public class SceneLoader
+    public class SceneLoader : MonoBehaviour
     {
-        public async Task LoadSceneAsync(string sceneName, Action onLoaded)
+        public void Load(string sceneName, Action onLoaded = null) =>
+            StartCoroutine(LoadScene(sceneName, onLoaded));
+
+        private IEnumerator LoadScene(string nextScene, Action onLoaded)
         {
-            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
-            asyncOperation.allowSceneActivation = false;
+            if (SceneManager.GetActiveScene().name == nextScene)
+            {
+                onLoaded?.Invoke();
+                yield break;
+            }
 
-            await LoadAsyncOperation(asyncOperation);
+            AsyncOperation waitNextScene = SceneManager.LoadSceneAsync(nextScene);
 
-            asyncOperation.allowSceneActivation = true;
+            while (waitNextScene.isDone == false)
+            {
+                yield return null;
+            }
+
             onLoaded?.Invoke();
-        }
-
-        private Task LoadAsyncOperation(AsyncOperation asyncOperation)
-        {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            asyncOperation.completed += (AsyncOperation op) => tcs.SetResult(true);
-            return tcs.Task;
         }
     }
 }
