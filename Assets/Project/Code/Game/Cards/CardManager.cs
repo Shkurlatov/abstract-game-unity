@@ -1,6 +1,8 @@
 ﻿using App.Services.Assets;
 using App.Services.Randomizer;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Cards
 {
@@ -24,6 +26,8 @@ namespace Game.Cards
 
             CardPlacer cardPlacer = new CardPlacer(_cards, gameMode);
             cardPlacer.PlaceCards();
+
+            ActivateCards();
         }
 
         private void ShuffleCards()
@@ -33,6 +37,19 @@ namespace Game.Cards
                 int randomIndex = _randomizer.Randomize(0, i);
                 (_cards[randomIndex], _cards[i]) = (_cards[i], _cards[randomIndex]);
             }
+        }
+
+        private void ActivateCards()
+        {
+            foreach (Card card in _cards)
+            {
+                card.Activate(OnCardClick);
+            }
+        }
+
+        private void OnCardClick(Card card)
+        {
+            Debug.Log("OnCardClick");
         }
     }
 }
