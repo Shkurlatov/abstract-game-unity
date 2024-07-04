@@ -21,6 +21,8 @@ namespace App.States
 
         public void Enter(GameController gameController)
         {
+            _gameController = gameController;
+            _gameController.Initialize();
             //_menuPanel = menuPanel;
             //_menuPanel.StartAction += LaunchGame;
             //_menuPanel.ExitAction += QuitGame;
