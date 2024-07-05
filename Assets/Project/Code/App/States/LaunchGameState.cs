@@ -42,7 +42,7 @@ namespace App.States
             InitScoreCounter(assets, uiRoot);
 
             ICards cards = InitCards(assets, randomizer);
-            GameController gameController = InitGameController(cards, homeButton);
+            GameController gameController = InitGameController(assets, cards, homeButton, uiRoot);
 
             _appStateMachine.Enter<GameState, GameController>(gameController);
         }
@@ -59,8 +59,8 @@ namespace App.States
         private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer) =>
             new CardManager(assets, randomizer);
 
-        private GameController InitGameController(ICards cards, HomeButton homeButton) =>
-            new GameController(cards, homeButton, _gameMode);
+        private GameController InitGameController(IAppAssetProvider assets, ICards cards, HomeButton homeButton, Transform uiRoot) =>
+            new GameController(assets, cards, homeButton, _gameMode, uiRoot);
 
         public void Exit() { }
     }
