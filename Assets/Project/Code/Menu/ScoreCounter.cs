@@ -1,0 +1,15 @@
+﻿using TMPro;
+using UnityEngine;
+
+namespace Menu
+{
+    public class ScoreCounter : MonoBehaviour
+    {
+        [SerializeField] private TMP_Text _scoreText;
+
+        public void UpdateCounter(int score)
+        {
+            _scoreText.text = score.ToString();
+        }
+    }
+}

@@ -1,9 +1,11 @@
 ﻿using App.Bootstrap;
 using App.Services;
 using App.Services.Assets;
+using App.Services.Progress;
 using App.Services.Randomizer;
 using Game;
 using Game.Cards;
+using Menu;
 using UnityEngine;
 
 namespace App.States
@@ -32,14 +34,18 @@ namespace App.States
             _sceneLoader.Load(GAME_SCENE, OnLoaded);
         }
 
-        private void OnLoaded()
+        private async void OnLoaded()
         {
             IAppAssetProvider assets = _appContext.Single<IAppAssetProvider>();
             IAppRandomizer randomizer = _appContext.Single<IAppRandomizer>();
+            IAppData data = _appContext.Single<IAppData>();
+
+            SettingsData settingsData = await data.LoadSettingsAsync();
+            ProgressData progressData = await data.LoadProgressAsync();
 
             Transform uiRoot = InitUIRoot();
             HomeButton homeButton = InitHomeButton(assets, uiRoot);
-            InitScoreCounter(assets, uiRoot);
+            ScoreCounter scoreCounter = InitScoreCounter(assets, uiRoot, progressData.Score);
 
             ICards cards = InitCards(assets, randomizer);
             GameController gameController = InitGameController(assets, cards, homeButton, uiRoot);
@@ -53,8 +59,12 @@ namespace App.States
         private HomeButton InitHomeButton(IAppAssetProvider assets, Transform uiRoot) =>
             assets.Instantiate(AssetPath.HOME_BUTTON, uiRoot).GetComponent<HomeButton>();
 
-        private void InitScoreCounter(IAppAssetProvider assets, Transform uiRoot) =>
-            assets.Instantiate(AssetPath.SCORE_COUNTER, uiRoot);
+        private ScoreCounter InitScoreCounter(IAppAssetProvider assets, Transform uiRoot, int score)
+        {
+            ScoreCounter scoreCounter = assets.Instantiate(AssetPath.SCORE_COUNTER, uiRoot).GetComponent<ScoreCounter>();
+            scoreCounter.UpdateCounter(score);
+            return scoreCounter;
+        }
 
         private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer) =>
             new CardManager(assets, randomizer);
