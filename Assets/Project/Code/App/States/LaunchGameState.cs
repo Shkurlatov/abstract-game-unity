@@ -41,16 +41,23 @@ namespace App.States
             IAppRandomizer randomizer = _appContext.Single<IAppRandomizer>();
             IAppData data = _appContext.Single<IAppData>();
             IAppAudio audio = _appContext.Single<IAppAudio>();
-
-            SettingsData settingsData = await data.LoadSettingsAsync();
             ProgressData progressData = await data.LoadProgressAsync();
 
             Transform uiRoot = InitUIRoot();
             HomeButton homeButton = InitHomeButton(assets, uiRoot);
             ScoreCounter scoreCounter = InitScoreCounter(assets, uiRoot, progressData.Score);
-
             ICards cards = InitCards(assets, randomizer, audio);
-            GameController gameController = InitGameController(assets, data, audio, cards, homeButton, uiRoot, scoreCounter, progressData.Score);
+
+            GameContext gameContext = new GameContext(
+                _appContext,
+                cards,
+                homeButton,
+                uiRoot,
+                scoreCounter,
+                _gameMode,
+                progressData.Score);
+
+            GameController gameController = new GameController(gameContext);
 
             _appStateMachine.Enter<GameState, GameController>(gameController);
         }
@@ -70,9 +77,6 @@ namespace App.States
 
         private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer, IAppAudio audio) =>
             new CardManager(assets, randomizer, audio);
-
-        private GameController InitGameController(IAppAssetProvider assets, IAppData data, IAppAudio audio, ICards cards, HomeButton homeButton, Transform uiRoot, ScoreCounter scoreCounter, int score) =>
-            new GameController(assets, data, audio, cards, homeButton, _gameMode, uiRoot, scoreCounter, score);
 
         public void Exit() { }
     }

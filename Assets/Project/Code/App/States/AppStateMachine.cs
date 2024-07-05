@@ -19,7 +19,7 @@ namespace App.States
                 [typeof(LaunchMenuState)] = new LaunchMenuState(this, sceneLoader, appContext),
                 [typeof(MenuState)] = new MenuState(this, appContext),
                 [typeof(LaunchGameState)] = new LaunchGameState(this, sceneLoader, appContext),
-                [typeof(GameState)] = new GameState(this, sceneLoader, appContext),
+                [typeof(GameState)] = new GameState(this, appContext),
             };
         }
 

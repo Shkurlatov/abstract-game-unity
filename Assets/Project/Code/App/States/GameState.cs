@@ -1,5 +1,4 @@
-﻿using App.Bootstrap;
-using App.Services;
+﻿using App.Services;
 using Game;
 
 namespace App.States
@@ -7,15 +6,13 @@ namespace App.States
     public class GameState : IPayloadedState<GameController>
     {
         private readonly IAppStateMachine _appStateMachine;
-        private readonly SceneLoader _sceneLoader;
         private readonly AppServiceContainer _appContext;
 
         private GameController _gameController;
 
-        public GameState(IAppStateMachine appStateMachine, SceneLoader sceneLoader, AppServiceContainer appContext)
+        public GameState(IAppStateMachine appStateMachine, AppServiceContainer appContext)
         {
             _appStateMachine = appStateMachine;
-            _sceneLoader = sceneLoader;
             _appContext = appContext;
         }
 

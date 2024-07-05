@@ -1,54 +1,31 @@
 ﻿using App.Services.Assets;
-using App.Services.Audio;
 using App.Services.Progress;
-using Game.Cards;
 using System;
 using UI;
-using UnityEngine;
 
 namespace Game
 {
     public class GameController
     {
-        private readonly IAppAssetProvider _assets;
-        private readonly IAppData _data;
-        private readonly IAppAudio _audio;
-        private readonly ICards _cards;
-        private readonly HomeButton _homeButton;
-        private readonly GameMode _gameMode;
-        private readonly Transform _uiRoot;
-        private readonly ScoreCounter _scoreCounter;
+        private readonly GameContext _context;
 
         private int _score;
+        private int _pairsLeft;
 
         public event Action LeaveGameAction;
 
-        private int _pairsLeft;
-
-        public GameController(IAppAssetProvider assets, IAppData data, IAppAudio audio, ICards cards, HomeButton homeButton, GameMode gameMode, Transform uiRoot, ScoreCounter scoreCounter, int score)
+        public GameController(GameContext gameContext)
         {
-            _assets = assets;
-            _data = data;
-            _audio = audio;
-            _cards = cards;
-            _homeButton = homeButton;
-            _gameMode = gameMode;
-            _uiRoot = uiRoot;
-            _scoreCounter = scoreCounter;
+            _context = gameContext;
 
-            _score = score;
-            _pairsLeft = gameMode.PairsCount;
+            _score = _context.Score;
+            _pairsLeft = _context.GameMode.PairsCount;
         }
 
         public void Initialize()
         {
-            _cards.LayOut(_gameMode, ProcessProcessResult);
-            _homeButton.HomeAction += LeaveGame;
-        }
-
-        private void LeaveGame()
-        {
-            LeaveGameAction?.Invoke();
+            _context.Cards.LayOut(_context.GameMode, ProcessProcessResult);
+            _context.HomeButton.HomeAction += LeaveGame;
         }
 
         private async void ProcessProcessResult(bool isMatch)
@@ -57,28 +34,37 @@ namespace Game
             {
                 _pairsLeft--;
                 _score++;
-                _scoreCounter.UpdateScore(_score);
-                _audio.PlayMatchSound();
+                _context.ScoreCounter.UpdateScore(_score);
+                _context.Audio.PlayMatchSound();
             }
             else
             {
-                _audio.PlayMismatchSound();
+                _context.Audio.PlayMismatchSound();
             }
 
             if (_pairsLeft == 0)
             {
-                _audio.PlayGameCompleteSound();
-                GameCompletePopup completePopup = _assets.Instantiate(AssetPath.GAME_COMPLETE_POPUP, _uiRoot).GetComponent<GameCompletePopup>();
+                _context.Audio.PlayGameCompleteSound();
+
+                GameCompletePopup completePopup = _context.Assets
+                    .Instantiate(AssetPath.GAME_COMPLETE_POPUP, _context.UIRoot)
+                    .GetComponent<GameCompletePopup>();
+
                 completePopup.Initialize(LeaveGame);
 
-                await _data.SaveProgressAsync(new ProgressData(_score));
+                await _context.Data.SaveProgressAsync(new ProgressData(_score));
             }
+        }
+
+        private void LeaveGame()
+        {
+            LeaveGameAction?.Invoke();
         }
 
         public void Cleanup()
         {
-            _homeButton.HomeAction -= LeaveGame;
-            _cards.Cleanup();
+            _context.HomeButton.HomeAction -= LeaveGame;
+            _context.Cards.Cleanup();
         }
     }
 }
