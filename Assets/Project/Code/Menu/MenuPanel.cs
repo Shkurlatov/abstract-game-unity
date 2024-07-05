@@ -1,3 +1,4 @@
+using App.Services.Progress;
 using Game;
 using System;
 using TMPro;
@@ -13,6 +14,7 @@ namespace Menu
         [SerializeField] private Button _startButton;
         [SerializeField] private Button _exitButton;
 
+        private IAppData _data;
         private int _gameModeValue;
 
         public event Action<GameMode> StartAction;
@@ -23,9 +25,6 @@ namespace Menu
             _gameModeSlider.onValueChanged.AddListener(OnGameModeValueChanged);
             _startButton.onClick.AddListener(OnStartButtonClick);
             _exitButton.onClick.AddListener(OnExitButtonClick);
-
-            _gameModeValue = (int)_gameModeSlider.value;
-            UpdateGameModeText();
         }
 
         private void OnDisable()
@@ -35,14 +34,29 @@ namespace Menu
             _exitButton.onClick.RemoveAllListeners();
         }
 
+        public async void Initialize(IAppData data)
+        {
+            _data = data;
+
+            SettingsData settingsData = await _data.LoadSettingsAsync();
+
+            _gameModeSlider.value = settingsData.GameMode;
+            _gameModeValue = settingsData.GameMode;
+            UpdateGameModeText();
+        }
+
         private void OnGameModeValueChanged(float value)
         {
             _gameModeValue = (int)value;
             UpdateGameModeText();
         }
 
-        private void OnStartButtonClick() => 
+        private async void OnStartButtonClick()
+        {
             StartAction?.Invoke(GetGameMode());
+
+            await _data.SaveSettingsAsync(new SettingsData(_gameModeValue));
+        }
 
         private void OnExitButtonClick() => 
             ExitAction?.Invoke();

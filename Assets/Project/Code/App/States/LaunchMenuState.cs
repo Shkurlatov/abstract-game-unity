@@ -31,12 +31,10 @@ namespace App.States
         {
             IAppAssetProvider assets = _appContext.Single<IAppAssetProvider>();
             IAppData data = _appContext.Single<IAppData>();
-
-            SettingsData settingsData = await data.LoadSettingsAsync();
             ProgressData progressData = await data.LoadProgressAsync();
 
             Transform uiRoot = InitUIRoot();
-            MenuPanel menuPanel = InitMenuPanel(assets, uiRoot);
+            MenuPanel menuPanel = InitMenuPanel(assets, data, uiRoot);
             InitScoreCounter(assets, uiRoot, progressData.Score);
 
             _appStateMachine.Enter<MenuState, MenuPanel>(menuPanel);
@@ -45,8 +43,12 @@ namespace App.States
         private Transform InitUIRoot() =>
             GameObject.FindGameObjectWithTag(UI_ROOT_TAG).transform;
 
-        private MenuPanel InitMenuPanel(IAppAssetProvider assets, Transform uiRoot) =>
-            assets.Instantiate(AssetPath.MENU_PANEL, uiRoot).GetComponent<MenuPanel>();
+        private MenuPanel InitMenuPanel(IAppAssetProvider assets, IAppData data, Transform uiRoot)
+        {
+            MenuPanel menuPanel = assets.Instantiate(AssetPath.MENU_PANEL, uiRoot).GetComponent<MenuPanel>();
+            menuPanel.Initialize(data);
+            return menuPanel;
+        }
 
         private void InitScoreCounter(IAppAssetProvider assets, Transform uiRoot, int score)
         {
