@@ -1,6 +1,7 @@
 ﻿using App.Bootstrap;
 using App.Services;
 using App.Services.Assets;
+using App.Services.Audio;
 using App.Services.Progress;
 using App.Services.Randomizer;
 using Game;
@@ -39,6 +40,7 @@ namespace App.States
             IAppAssetProvider assets = _appContext.Single<IAppAssetProvider>();
             IAppRandomizer randomizer = _appContext.Single<IAppRandomizer>();
             IAppData data = _appContext.Single<IAppData>();
+            IAppAudio audio = _appContext.Single<IAppAudio>();
 
             SettingsData settingsData = await data.LoadSettingsAsync();
             ProgressData progressData = await data.LoadProgressAsync();
@@ -47,8 +49,8 @@ namespace App.States
             HomeButton homeButton = InitHomeButton(assets, uiRoot);
             ScoreCounter scoreCounter = InitScoreCounter(assets, uiRoot, progressData.Score);
 
-            ICards cards = InitCards(assets, randomizer);
-            GameController gameController = InitGameController(assets, data, cards, homeButton, uiRoot, scoreCounter, progressData.Score);
+            ICards cards = InitCards(assets, randomizer, audio);
+            GameController gameController = InitGameController(assets, data, audio, cards, homeButton, uiRoot, scoreCounter, progressData.Score);
 
             _appStateMachine.Enter<GameState, GameController>(gameController);
         }
@@ -66,11 +68,11 @@ namespace App.States
             return scoreCounter;
         }
 
-        private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer) =>
-            new CardManager(assets, randomizer);
+        private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer, IAppAudio audio) =>
+            new CardManager(assets, randomizer, audio);
 
-        private GameController InitGameController(IAppAssetProvider assets, IAppData data, ICards cards, HomeButton homeButton, Transform uiRoot, ScoreCounter scoreCounter, int score) =>
-            new GameController(assets, data, cards, homeButton, _gameMode, uiRoot, scoreCounter, score);
+        private GameController InitGameController(IAppAssetProvider assets, IAppData data, IAppAudio audio, ICards cards, HomeButton homeButton, Transform uiRoot, ScoreCounter scoreCounter, int score) =>
+            new GameController(assets, data, audio, cards, homeButton, _gameMode, uiRoot, scoreCounter, score);
 
         public void Exit() { }
     }

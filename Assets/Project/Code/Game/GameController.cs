@@ -1,4 +1,5 @@
 ﻿using App.Services.Assets;
+using App.Services.Audio;
 using App.Services.Progress;
 using Game.Cards;
 using System;
@@ -11,6 +12,7 @@ namespace Game
     {
         private readonly IAppAssetProvider _assets;
         private readonly IAppData _data;
+        private readonly IAppAudio _audio;
         private readonly ICards _cards;
         private readonly HomeButton _homeButton;
         private readonly GameMode _gameMode;
@@ -23,10 +25,11 @@ namespace Game
 
         private int _pairsLeft;
 
-        public GameController(IAppAssetProvider assets, IAppData data, ICards cards, HomeButton homeButton, GameMode gameMode, Transform uiRoot, ScoreCounter scoreCounter, int score)
+        public GameController(IAppAssetProvider assets, IAppData data, IAppAudio audio, ICards cards, HomeButton homeButton, GameMode gameMode, Transform uiRoot, ScoreCounter scoreCounter, int score)
         {
             _assets = assets;
             _data = data;
+            _audio = audio;
             _cards = cards;
             _homeButton = homeButton;
             _gameMode = gameMode;
@@ -59,16 +62,18 @@ namespace Game
 
             if (_pairsLeft == 0)
             {
-                await _data.SaveProgressAsync(new ProgressData(_score));
-
+                _audio.PlayGameCompleteSound();
                 GameCompletePopup completePopup = _assets.Instantiate(AssetPath.GAME_COMPLETE_POPUP, _uiRoot).GetComponent<GameCompletePopup>();
                 completePopup.Initialize(LeaveGame);
+
+                await _data.SaveProgressAsync(new ProgressData(_score));
             }
         }
 
         public void Cleanup()
         {
             _homeButton.HomeAction -= LeaveGame;
+            _cards.Cleanup();
         }
     }
 }

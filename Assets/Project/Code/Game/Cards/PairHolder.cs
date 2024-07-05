@@ -1,10 +1,13 @@
-﻿using System;
+﻿using App.Services.Audio;
+using System;
 using UnityEngine;
 
 namespace Game.Cards
 {
     public class PairHolder
     {
+        private readonly IAppAudio _audio;
+
         private Card _initialCard;
         private Card _followCard;
 
@@ -12,8 +15,9 @@ namespace Game.Cards
 
         private readonly Action<bool> CompareResultAction;
 
-        public PairHolder(Action<bool> compareResultAction)
+        public PairHolder(IAppAudio audio, Action<bool> compareResultAction)
         {
+            _audio = audio;
             CompareResultAction = compareResultAction;
         }
 
@@ -23,6 +27,7 @@ namespace Game.Cards
             {
                 _initialCard = card;
                 _initialCard.Open();
+                _audio.PlayCardFlipSound();
                 return;
             }
 
@@ -31,6 +36,7 @@ namespace Game.Cards
                 _followCard = card;
                 _followCard.CardOpenedAction += OnCardsOpened;
                 _followCard.Open();
+                _audio.PlayCardFlipSound();
                 return;
             }
 
@@ -46,11 +52,13 @@ namespace Game.Cards
             {
                 _initialCard.Disappear();
                 _followCard.Disappear();
+                _audio.PlayMatchSound();
             }
             else
             {
                 _initialCard.Close();
                 _followCard.Close();
+                _audio.PlayMismatchSound();
             }
 
             _initialCard = null;
