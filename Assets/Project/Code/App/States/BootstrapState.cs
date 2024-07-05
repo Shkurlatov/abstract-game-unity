@@ -1,6 +1,7 @@
 ﻿using App.Bootstrap;
 using App.Services;
 using App.Services.Assets;
+using App.Services.Progress;
 using App.Services.Randomizer;
 
 namespace App.States
@@ -34,6 +35,7 @@ namespace App.States
         {
             RegisterAssetProvider();
             RegisterRandomizer();
+            RegisterData();
         }
 
         private void RegisterAssetProvider() =>
@@ -41,6 +43,9 @@ namespace App.States
 
         private void RegisterRandomizer() =>
             _appContext.RegisterSingle<IAppRandomizer>(new SystemRandomizer());
+        
+        private void RegisterData() =>
+            _appContext.RegisterSingle<IAppData>(new PlayerPrefsSaveLoadManager());
 
         public void Exit() { }
     }
