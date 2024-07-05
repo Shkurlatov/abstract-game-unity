@@ -2,18 +2,22 @@
 using App.Services.Audio;
 using App.Services.Randomizer;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Cards
 {
     public class CardManager : ICards
     {
+        private readonly object _lock = new object(); 
         private readonly CardFactory _cardFactory;
         private readonly IAppRandomizer _randomizer;
         private readonly IAppAudio _audio;
 
         private List<Card> _cards = new List<Card>();
-        private Queue<PairHolder> _pairPool = new Queue<PairHolder>();
+        private ConcurrentDictionary<int, bool> _blockedCardIds;
+        private Card _waitingCompareCard;
 
         private Action<bool> CompareResultAction;
 
@@ -27,6 +31,7 @@ namespace Game.Cards
         public void LayOut(GameMode gameMode, Action<bool> compareResultAction)
         {
             _cards = _cardFactory.CreateCards(gameMode.PairsCount);
+            _blockedCardIds = new ConcurrentDictionary<int, bool>(Environment.ProcessorCount, _cards.Count);
             CompareResultAction = compareResultAction;
 
             ShuffleCards();
@@ -34,7 +39,6 @@ namespace Game.Cards
             CardPlacer cardPlacer = new CardPlacer(_cards, gameMode);
             cardPlacer.PlaceCards();
 
-            FillPairPool();
             ActivateCards();
         }
 
@@ -47,43 +51,55 @@ namespace Game.Cards
             }
         }
 
-        private void FillPairPool()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                _pairPool.Enqueue(new PairHolder(_audio, CompareResultAction));
-            }
-        }
-
         private void ActivateCards()
         {
             for (int i = 0; i < _cards.Count; i++)
             {
-                _cards[i].Activate(i, OnCardClick);
+                _cards[i].Activate(i, OnCardClick, OnCardRelease);
             }
         }
 
         private void OnCardClick(Card card)
         {
-            AddCardToPairHolder(card);
+            if (_blockedCardIds.TryAdd(card.Id, true))
+            {
+                CompareCard(card);
+            }
         }
 
-        private void AddCardToPairHolder(Card card)
+        private void OnCardRelease(int cardId)
         {
-            foreach (PairHolder holder in _pairPool)
+            if (_blockedCardIds.TryRemove(cardId, out _) == false)
             {
-                if (holder.IsAvailable)
+                Debug.LogError($"Card for id {cardId} lost on release operation.");
+            }
+        }
+
+        private void CompareCard(Card card)
+        {
+            card.Open();
+
+            lock (_lock)
+            {
+                if (_waitingCompareCard == null)
                 {
-                    holder.AddCard(card);
-                    return;
+                    _waitingCompareCard = card;
+                }
+                else
+                {
+                    PairHolder pairHolder = new PairHolder(CompareResultAction, _waitingCompareCard, card);
+                    _waitingCompareCard = null;
                 }
             }
 
-            PairHolder pairHolder = new PairHolder(_audio, CompareResultAction);
-            pairHolder.AddCard(card);
-            _pairPool.Enqueue(pairHolder);
+            _audio.PlayCardFlipSound();
         }
 
-        public void Cleanup() { }
+        public void Cleanup()
+        {
+            _cards.Clear();
+            _blockedCardIds.Clear();
+            _waitingCompareCard = null;
+        }
     }
 }

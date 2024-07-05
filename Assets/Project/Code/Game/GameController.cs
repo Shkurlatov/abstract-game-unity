@@ -58,6 +58,11 @@ namespace Game
                 _pairsLeft--;
                 _score++;
                 _scoreCounter.UpdateScore(_score);
+                _audio.PlayMatchSound();
+            }
+            else
+            {
+                _audio.PlayMismatchSound();
             }
 
             if (_pairsLeft == 0)

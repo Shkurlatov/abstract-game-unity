@@ -20,6 +20,17 @@ namespace Game.Cards
         public event Action CardOpenedAction;
 
         private Action<Card> CardClickAction;
+        private Action<int> CardReleaseAction;
+
+        private void OnEnable()
+        {
+            _button.onClick.AddListener(OnCardClick);
+        }
+
+        private void OnDisable()
+        {
+            _button.onClick.RemoveAllListeners();
+        }
 
         public void Initialize(int typeId)
         {
@@ -36,19 +47,22 @@ namespace Game.Cards
             _rectTransform.localPosition = cardPosition;
         }
 
-        public void Activate(int cardId, Action<Card> onCardClickAction)
+        public void Activate(int cardId, Action<Card> cardClickAction, Action<int> cardReleaseAction)
         {
             Id = cardId;
-            CardClickAction = onCardClickAction;
+            CardClickAction = cardClickAction;
+            CardReleaseAction = cardReleaseAction;
         }
 
-        public void OnClick()
+        public void OnCardClick()
         {
             CardClickAction(this);
         }
 
         public void Open()
         {
+            _button.interactable = false;
+            StopAllCoroutines();
             StartCoroutine(OpenCard());
         }
 
@@ -56,6 +70,8 @@ namespace Game.Cards
         {
             StopAllCoroutines();
             StartCoroutine(CloseCard());
+            CardReleaseAction(Id);
+            _button.interactable = true;
         }
 
         public void Disappear()
@@ -97,8 +113,6 @@ namespace Game.Cards
                 transform.localRotation = Quaternion.Euler(0, currentAngle, 0);
                 yield return null;
             }
-
-            _button.interactable = true;
         }
 
         private IEnumerator DisappearCard()
