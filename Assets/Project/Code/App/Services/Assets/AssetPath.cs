@@ -8,5 +8,6 @@
         public const string HOME_BUTTON = "UI/HomeButton";
         public const string SCORE_COUNTER = "UI/ScoreCounter";
         public const string GAME_COMPLETE_POPUP = "UI/GameCompletePopup";
+        public const string AUDIO_PLAYER = "App/AudioPlayer";
     }
 }

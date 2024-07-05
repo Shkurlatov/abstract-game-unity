@@ -1,6 +1,7 @@
 ﻿using App.Bootstrap;
 using App.Services;
 using App.Services.Assets;
+using App.Services.Audio;
 using App.Services.Progress;
 using App.Services.Randomizer;
 
@@ -26,26 +27,37 @@ namespace App.States
 
         private void OnLoaded()
         {
-            RegisterServices();
+            RegisterAppServices();
 
             _appStateMachine.Enter<LaunchMenuState>();
         }
 
-        private void RegisterServices()
+        private void RegisterAppServices()
         {
-            RegisterAssetProvider();
+            IAppAssetProvider assets = RegisterAssetProvider();
             RegisterRandomizer();
             RegisterData();
+            RegisterAudio(assets);
         }
 
-        private void RegisterAssetProvider() =>
-            _appContext.RegisterSingle<IAppAssetProvider>(new AssetProvider());
+        private IAppAssetProvider RegisterAssetProvider()
+        {
+            IAppAssetProvider assets = new AssetProvider();
+            _appContext.RegisterSingle(assets);
+            return assets;
+        }
 
         private void RegisterRandomizer() =>
             _appContext.RegisterSingle<IAppRandomizer>(new SystemRandomizer());
         
         private void RegisterData() =>
             _appContext.RegisterSingle<IAppData>(new PlayerPrefsSaveLoadManager());
+
+        private void RegisterAudio(IAppAssetProvider assets)
+        {
+            IAppAudio audio = assets.Instantiate(AssetPath.AUDIO_PLAYER).GetComponent<AudioPlayer>();
+            _appContext.RegisterSingle(audio);
+        }
 
         public void Exit() { }
     }
