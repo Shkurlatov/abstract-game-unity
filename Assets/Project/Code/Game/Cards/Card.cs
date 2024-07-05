@@ -7,39 +7,19 @@ namespace Game.Cards
 {
     public class Card : MonoBehaviour
     {
-        private enum State
-        {
-            None = 0,
-            Ready = 1,
-            Open = 2,
-            Wait = 3,
-            Match = 4,
-            UnMatch = 5,
-            Close = 6,
-            Destroy = 7,
-        }
-
         [SerializeField] private RectTransform _rectTransform;
         [SerializeField] private Button _button;
+        [SerializeField] private Image _image;
 
         private readonly float _rotationSpeed = 250.0f;
+        private readonly float _fadeDuration = 1.0f;
 
-        private State _state;
-        private Card _comparisonCard;
-
+        public int Id { get; private set; }
         public int TypeId { get; private set; }
 
+        public event Action CardOpenedAction;
+
         private Action<Card> CardClickAction;
-
-        private void OnEnable()
-        {
-            _button.onClick.AddListener(OnCardClick);
-        }
-
-        private void OnDisable()
-        {
-            _button.onClick.RemoveAllListeners();
-        }
 
         public void Initialize(int typeId)
         {
@@ -56,52 +36,31 @@ namespace Game.Cards
             _rectTransform.localPosition = cardPosition;
         }
 
-        public void Activate(Action<Card> onCardClickAction)
+        public void Activate(int cardId, Action<Card> onCardClickAction)
         {
+            Id = cardId;
             CardClickAction = onCardClickAction;
-            _state = State.Ready;
         }
 
-        public void ProcessMatchingResult(bool isMatch, Card comparisonCard)
+        public void OnClick()
         {
-            _comparisonCard = comparisonCard;
-            _comparisonCard.ApplyMatchingResult(isMatch);
-            ApplyMatchingResult(isMatch);
-        }
-
-        private void OnCardClick()
-        {
-            if (_state != State.Ready)
-            {
-                return;
-            }
-
-            _state = State.Open;
             CardClickAction?.Invoke(this);
+        }
+
+        public void Open()
+        {
             StartCoroutine(OpenCard());
         }
 
-        public void ApplyMatchingResult(bool isMatch)
+        public void Close()
         {
-            switch (_state)
-            {
-                case State.Open:
-                    _state = isMatch
-                        ? State.Match
-                        : State.UnMatch;
-                    break;
+            StopAllCoroutines();
+            StartCoroutine(CloseCard());
+        }
 
-                case State.Wait:
-                    _state = isMatch
-                        ? State.Destroy
-                        : State.Close;
-                    StartCoroutine(CloseCard());
-                    break;
-
-                default:
-                    Debug.LogError($"Unexpected card state {_state} on set match result operation.");
-                    break;
-            }
+        public void Disappear()
+        {
+            StartCoroutine(DisappearCard());
         }
 
         private IEnumerator OpenCard()
@@ -120,9 +79,9 @@ namespace Game.Cards
                 yield return null;
             }
 
-            OnOpened();
+            CardOpenedAction?.Invoke();
         }
-        
+
         private IEnumerator CloseCard()
         {
             float currentAngle = 180.0f;
@@ -139,53 +98,20 @@ namespace Game.Cards
                 yield return null;
             }
 
-            OnClosed();
+            _button.interactable = true;
         }
 
-        private void OnOpened()
+        private IEnumerator DisappearCard()
         {
-            switch (_state)
+            Color imageColor = _image.color;
+            float elapsedTime = 0.0f;
+
+            while (elapsedTime < _fadeDuration)
             {
-                case State.Open:
-                    _state = State.Wait;
-                    break;
-
-                case State.Match:
-                    _state = State.Destroy;
-                    StartCoroutine(CloseCard());
-                    break;
-
-                case State.UnMatch:
-                    _state = State.Close;
-                    StartCoroutine(CloseCard());
-                    break;
-
-                default:
-                    Debug.LogError($"Unexpected card state {_state} on card opened operation.");
-                    break;
-            }
-        }
-
-        private void OnClosed()
-        {
-            if (_comparisonCard != null)
-            {
-                _comparisonCard = null;
-            }
-
-            switch (_state)
-            {
-                case State.Close:
-                    _state = State.Ready;
-                    break;
-
-                case State.Destroy:
-                    Destroy(gameObject);
-                    break;
-
-                default:
-                    Debug.LogError($"Unexpected card state {_state} on card closed operation.");
-                    break;
+                elapsedTime += Time.deltaTime;
+                float alpha = Mathf.Lerp(imageColor.a, 0.0f, elapsedTime / _fadeDuration);
+                _image.color = new Color(imageColor.r, imageColor.g, imageColor.b, alpha);
+                yield return null;
             }
         }
     }
