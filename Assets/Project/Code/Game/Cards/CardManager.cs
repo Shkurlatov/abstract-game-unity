@@ -2,7 +2,6 @@
 using App.Services.Randomizer;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Game.Cards
 {
@@ -12,6 +11,9 @@ namespace Game.Cards
         private readonly IAppRandomizer _randomizer;
 
         private List<Card> _cards = new List<Card>();
+        private Queue<PairHolder> _pairPool = new Queue<PairHolder>();
+
+        private Action<bool> CompareResultAction;
 
         public CardManager(IAppAssetProvider assets, IAppRandomizer randomizer)
         {
@@ -19,14 +21,17 @@ namespace Game.Cards
             _randomizer = randomizer;
         }
 
-        public void LayOut(GameMode gameMode)
+        public void LayOut(GameMode gameMode, Action<bool> compareResultAction)
         {
             _cards = _cardFactory.CreateCards(gameMode.PairsCount);
+            CompareResultAction = compareResultAction;
+
             ShuffleCards();
 
             CardPlacer cardPlacer = new CardPlacer(_cards, gameMode);
             cardPlacer.PlaceCards();
 
+            FillPairPool();
             ActivateCards();
         }
 
@@ -39,17 +44,41 @@ namespace Game.Cards
             }
         }
 
+        private void FillPairPool()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                _pairPool.Enqueue(new PairHolder(CompareResultAction));
+            }
+        }
+
         private void ActivateCards()
         {
-            foreach (Card card in _cards)
+            for (int i = 0; i < _cards.Count; i++)
             {
-                card.Activate(OnCardClick);
+                _cards[i].Activate(i, OnCardClick);
             }
         }
 
         private void OnCardClick(Card card)
         {
-            Debug.Log("OnCardClick");
+            AddCardToPairHolder(card);
+        }
+
+        private void AddCardToPairHolder(Card card)
+        {
+            foreach (PairHolder holder in _pairPool)
+            {
+                if (holder.IsAvailable)
+                {
+                    holder.AddCard(card);
+                    return;
+                }
+            }
+
+            PairHolder pairHolder = new PairHolder(CompareResultAction);
+            pairHolder.AddCard(card);
+            _pairPool.Enqueue(pairHolder);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Game.Cards
 
         public void OnClick()
         {
-            CardClickAction?.Invoke(this);
+            CardClickAction(this);
         }
 
         public void Open()

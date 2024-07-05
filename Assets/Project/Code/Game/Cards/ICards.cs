@@ -1,7 +1,9 @@
-﻿namespace Game.Cards
+﻿using System;
+
+namespace Game.Cards
 {
     public interface ICards
     {
-        void LayOut(GameMode gameMode);
+        void LayOut(GameMode gameMode, Action<bool> matchResultAction);
     }
 }

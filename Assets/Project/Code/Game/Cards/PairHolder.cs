@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Game.Cards
 {
@@ -9,20 +10,27 @@ namespace Game.Cards
 
         public bool IsAvailable => _followCard == null;
 
+        private readonly Action<bool> CompareResultAction;
+
+        public PairHolder(Action<bool> compareResultAction)
+        {
+            CompareResultAction = compareResultAction;
+        }
+
         public void AddCard(Card card)
         {
             if (_initialCard == null)
             {
                 _initialCard = card;
-                card.Open();
+                _initialCard.Open();
                 return;
             }
 
             if (_followCard == null)
             {
                 _followCard = card;
-                card.CardOpenedAction += OnCardsOpened;
-                card.Open();
+                _followCard.CardOpenedAction += OnCardsOpened;
+                _followCard.Open();
                 return;
             }
 
@@ -47,6 +55,8 @@ namespace Game.Cards
 
             _initialCard = null;
             _followCard = null;
+
+            CompareResultAction(isMatch);
         }
     }
 }
