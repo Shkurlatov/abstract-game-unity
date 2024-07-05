@@ -7,7 +7,7 @@ namespace UI
     {
         [SerializeField] private TMP_Text _scoreText;
 
-        public void UpdateCounter(int score)
+        public void UpdateScore(int score)
         {
             _scoreText.text = score.ToString();
         }

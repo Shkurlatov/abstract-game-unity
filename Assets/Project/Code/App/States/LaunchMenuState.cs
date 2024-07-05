@@ -51,7 +51,7 @@ namespace App.States
         private void InitScoreCounter(IAppAssetProvider assets, Transform uiRoot, int score)
         {
             ScoreCounter scoreCounter = assets.Instantiate(AssetPath.SCORE_COUNTER, uiRoot).GetComponent<ScoreCounter>();
-            scoreCounter.UpdateCounter(score);
+            scoreCounter.UpdateScore(score);
         }
 
         public void Exit() { }

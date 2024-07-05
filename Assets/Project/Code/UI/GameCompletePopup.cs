@@ -17,7 +17,7 @@ namespace UI
         private float _elapsedTime = 0.0f;
         private Color _originalColor;
 
-        private Action CompleteAction;
+        private Action LeaveGameAction;
 
         private void Awake()
         {
@@ -25,9 +25,9 @@ namespace UI
             SetTextAlpha(0);
         }
 
-        public void Initialize(Action completeAction)
+        public void Initialize(Action leaveGameAction)
         {
-            CompleteAction = completeAction;
+            LeaveGameAction = leaveGameAction;
             StartCoroutine(AnimatePopup());
         }
 
@@ -53,7 +53,7 @@ namespace UI
 
             yield return new WaitForSeconds(_duration);
 
-            CompleteAction?.Invoke();
+            LeaveGameAction?.Invoke();
             Destroy(gameObject);
         }
 

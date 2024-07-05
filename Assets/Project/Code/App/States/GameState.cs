@@ -23,12 +23,12 @@ namespace App.States
         {
             _gameController = gameController;
             _gameController.Initialize();
-            _gameController.GameCompleteAction += ReturnToMenu;
+            _gameController.LeaveGameAction += ReturnToMenu;
         }
 
         private void ReturnToMenu()
         {
-            _gameController.GameCompleteAction -= ReturnToMenu;
+            _gameController.LeaveGameAction -= ReturnToMenu;
 
             _appStateMachine.Enter<LaunchMenuState>();
         }

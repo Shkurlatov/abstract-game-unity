@@ -48,7 +48,7 @@ namespace App.States
             ScoreCounter scoreCounter = InitScoreCounter(assets, uiRoot, progressData.Score);
 
             ICards cards = InitCards(assets, randomizer);
-            GameController gameController = InitGameController(assets, cards, homeButton, uiRoot);
+            GameController gameController = InitGameController(assets, data, cards, homeButton, uiRoot, scoreCounter, progressData.Score);
 
             _appStateMachine.Enter<GameState, GameController>(gameController);
         }
@@ -62,15 +62,15 @@ namespace App.States
         private ScoreCounter InitScoreCounter(IAppAssetProvider assets, Transform uiRoot, int score)
         {
             ScoreCounter scoreCounter = assets.Instantiate(AssetPath.SCORE_COUNTER, uiRoot).GetComponent<ScoreCounter>();
-            scoreCounter.UpdateCounter(score);
+            scoreCounter.UpdateScore(score);
             return scoreCounter;
         }
 
         private ICards InitCards(IAppAssetProvider assets, IAppRandomizer randomizer) =>
             new CardManager(assets, randomizer);
 
-        private GameController InitGameController(IAppAssetProvider assets, ICards cards, HomeButton homeButton, Transform uiRoot) =>
-            new GameController(assets, cards, homeButton, _gameMode, uiRoot);
+        private GameController InitGameController(IAppAssetProvider assets, IAppData data, ICards cards, HomeButton homeButton, Transform uiRoot, ScoreCounter scoreCounter, int score) =>
+            new GameController(assets, data, cards, homeButton, _gameMode, uiRoot, scoreCounter, score);
 
         public void Exit() { }
     }
