@@ -12,6 +12,7 @@ namespace Game.Cards
         [SerializeField] private Image _image;
 
         private readonly float _rotationSpeed = 250.0f;
+        private readonly float _demoDuration = 1.0f;
         private readonly float _fadeDuration = 1.0f;
 
         public int Id { get; private set; }
@@ -34,6 +35,7 @@ namespace Game.Cards
 
         public void Initialize(int typeId)
         {
+            _button.interactable = false;
             TypeId = typeId;
         }
 
@@ -52,6 +54,7 @@ namespace Game.Cards
             Id = cardId;
             CardClickAction = cardClickAction;
             CardReleaseAction = cardReleaseAction;
+            StartCoroutine(InitialCardDemonstration());
         }
 
         public void OnCardClick()
@@ -77,6 +80,28 @@ namespace Game.Cards
         public void Disappear()
         {
             StartCoroutine(DisappearCard());
+        }
+
+        private IEnumerator InitialCardDemonstration()
+        {
+            float currentAngle = 0.0f;
+            while (currentAngle < 180.0f)
+            {
+                currentAngle += _rotationSpeed * Time.deltaTime;
+
+                if (currentAngle > 180.0f)
+                {
+                    currentAngle = 180.0f;
+                }
+
+                transform.localRotation = Quaternion.Euler(0, currentAngle, 0);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(_demoDuration);
+
+            StartCoroutine(CloseCard());
+            _button.interactable = true;
         }
 
         private IEnumerator OpenCard()
