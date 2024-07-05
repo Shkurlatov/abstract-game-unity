@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Game
+namespace UI
 {
     public class HomeButton : MonoBehaviour
     {

@@ -5,7 +5,7 @@ using App.Services.Progress;
 using App.Services.Randomizer;
 using Game;
 using Game.Cards;
-using Menu;
+using UI;
 using UnityEngine;
 
 namespace App.States

@@ -3,7 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace Game
+namespace UI
 {
     public class GameCompletePopup : MonoBehaviour
     {
@@ -73,7 +73,7 @@ namespace Game
         {
             _popupText.transform.localPosition = new Vector3(
                 originalPosition.x,
-                originalPosition.y + (time * _moveSpeed),
+                originalPosition.y + time * _moveSpeed,
                 originalPosition.z
             );
         }

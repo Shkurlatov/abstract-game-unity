@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace Menu
+namespace UI
 {
     public class ScoreCounter : MonoBehaviour
     {
