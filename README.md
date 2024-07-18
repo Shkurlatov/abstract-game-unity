@@ -1,8 +1,14 @@
 # Abstract Game Prototype
 
+![Header](docs/media/project_demo.gif)
+
 ## Overview
 
-This repository contains the prototype of an abstract game developed using Unity 2021.3.25f1. The project demonstrates core game development skills and adherence to best practices in Unity development.
+This repository contains the prototype of an abstract game developed using Unity 2021.3.25f1. The project demonstrates core game development skills and adherence to the specific requirements of the test assignment.
+
+The project has certain features and constraints due to the specific requirements and limitations of the test assignment it was created for. One requirement was to use a non-descriptive project name and omit detailed descriptions of the genre and core mechanics in the documentation, to prevent direct copying among participants during the selection process. Additionally, the task emphasized minimizing the use of third-party packages and plugins, encouraging the development of custom logic. The project was also to be completed within a strictly defined timeframe.
+
+Therefore, this implementation is not intended to showcase best practices for building a production-level application. Instead, it serves as a demonstration of the ability to rapidly prototype a new genre under specified constraints.
 
 ## Features
 
@@ -35,6 +41,3 @@ This repository contains the prototype of an abstract game developed using Unity
    - **For Desktop:** Navigate to `File` > `Build Settings` > Select `PC, Mac & Linux Standalone` > Click `Build`.
    - **For Android:** Navigate to `File` > `Build Settings` > Select `Android` > Click `Build`.
    - **For iOS:** Navigate to `File` > `Build Settings` > Select `iOS` > Click `Build`.
-
-4. **Play the Game:**
-   - Run the executable or deploy the APK/IPA file for testing.
